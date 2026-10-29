@@ -1,6 +1,6 @@
 /**
  * @file input.js
- * @description Gerenciador Unificado de Entrada: Controles Touch (Joystick Virtual),
+ * @description Gerenciador Unificado de Entrada: Controles Touch (Joystick Virtual sem overlay bloqueante),
  * Gamepad (HTML5 Gamepad API) e Sistema de Exportação/Importação de Save.
  */
 
@@ -133,48 +133,53 @@
             }
         },
 
-        // --- Configuração Touch Joystick ---
+        // --- Configuração Touch Joystick (Direct Canvas binding, ZERO overlay) ---
         _setupTouchJoystick() {
             joystickBaseEl = document.getElementById('touch-joystick-base');
             joystickKnobEl = document.getElementById('touch-joystick-knob');
-            const joystickZone = document.getElementById('touch-joystick-zone');
+            const canvasEl = document.getElementById('game-canvas');
 
-            if (!joystickZone || !joystickBaseEl || !joystickKnobEl) return;
+            if (!canvasEl || !joystickBaseEl || !joystickKnobEl) return;
 
             const onTouchStart = (e) => {
-                if (touchState.active) return;
-                // Ignora se o jogo não estiver rodando
+                if (touchState.active || !e.changedTouches || e.changedTouches.length === 0) return;
                 if (typeof gameState !== 'undefined' && gameState !== 'PLAYING') return;
 
                 const touch = e.changedTouches[0];
-                // Ativa apenas na metade esquerda da tela para não conflitar com botões
-                const rect = joystickZone.getBoundingClientRect();
+                const rect = canvasEl.getBoundingClientRect();
                 const touchX = touch.clientX - rect.left;
                 const touchY = touch.clientY - rect.top;
 
-                if (touchX > rect.width * 0.65) return; // Permite toque nos 65% à esquerda
+                // Em modo WASD ou toque na metade esquerda da tela -> ativa joystick analógico
+                if ((typeof controlScheme !== 'undefined' && controlScheme === 'wasd') || touchX < rect.width * 0.5) {
+                    touchState.active = true;
+                    touchState.touchId = touch.identifier;
+                    touchState.startX = touchX;
+                    touchState.startY = touchY;
+                    touchState.dx = 0;
+                    touchState.dy = 0;
 
-                touchState.active = true;
-                touchState.touchId = touch.identifier;
-                touchState.startX = touchX;
-                touchState.startY = touchY;
-                touchState.dx = 0;
-                touchState.dy = 0;
-
-                // Posiciona e exibe o joystick base
-                joystickBaseEl.style.left = `${touchX}px`;
-                joystickBaseEl.style.top = `${touchY}px`;
-                joystickKnobEl.style.transform = `translate(-50%, -50%)`;
-                joystickBaseEl.classList.remove('hidden');
+                    joystickBaseEl.style.left = `${touchX}px`;
+                    joystickBaseEl.style.top = `${touchY}px`;
+                    joystickKnobEl.style.transform = `translate(-50%, -50%)`;
+                    joystickBaseEl.classList.remove('hidden');
+                } else if (typeof controlScheme !== 'undefined' && controlScheme === 'mouse') {
+                    // No modo mouse em dispositivos de toque, tocar na tela move o jogador
+                    if (typeof movementTarget !== 'undefined') {
+                        movementTarget.x = touchX;
+                        movementTarget.y = touchY;
+                        movementTarget.time = typeof gameTime !== 'undefined' ? gameTime : 0;
+                    }
+                }
             };
 
             const onTouchMove = (e) => {
-                if (!touchState.active) return;
+                if (!touchState.active || !e.changedTouches) return;
 
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const touch = e.changedTouches[i];
                     if (touch.identifier === touchState.touchId) {
-                        const rect = joystickZone.getBoundingClientRect();
+                        const rect = canvasEl.getBoundingClientRect();
                         const currentX = touch.clientX - rect.left;
                         const currentY = touch.clientY - rect.top;
 
@@ -186,7 +191,6 @@
                             touchState.dx = deltaX / distance;
                             touchState.dy = deltaY / distance;
 
-                            // Limita o deslocamento do knob ao raio máximo
                             const clampedDistance = Math.min(distance, touchState.maxRadius);
                             const knobX = (deltaX / distance) * clampedDistance;
                             const knobY = (deltaY / distance) * clampedDistance;
@@ -202,7 +206,7 @@
             };
 
             const onTouchEnd = (e) => {
-                if (!touchState.active) return;
+                if (!touchState.active || !e.changedTouches) return;
 
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     if (e.changedTouches[i].identifier === touchState.touchId) {
@@ -217,10 +221,10 @@
                 }
             };
 
-            joystickZone.addEventListener('touchstart', onTouchStart, { passive: false });
-            joystickZone.addEventListener('touchmove', onTouchMove, { passive: false });
-            joystickZone.addEventListener('touchend', onTouchEnd, { passive: false });
-            joystickZone.addEventListener('touchcancel', onTouchEnd, { passive: false });
+            canvasEl.addEventListener('touchstart', onTouchStart, { passive: true });
+            canvasEl.addEventListener('touchmove', onTouchMove, { passive: true });
+            canvasEl.addEventListener('touchend', onTouchEnd, { passive: true });
+            canvasEl.addEventListener('touchcancel', onTouchEnd, { passive: true });
         },
 
         // --- Configuração dos Botões de Habilidade para Touch Rápido ---
@@ -236,12 +240,11 @@
                 const el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
                         e.stopPropagation();
                         if (typeof gameState !== 'undefined' && gameState === 'PLAYING') {
                             action();
                         }
-                    }, { passive: false });
+                    }, { passive: true });
                 }
             });
         },
