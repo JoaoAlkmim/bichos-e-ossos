@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bichos&Ossos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&amp;display=swap" rel="stylesheet"/>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div id="game-container" class="game-level-up">
+<canvas id="game-canvas"></canvas>
+
+<div class="hud-panel w-48 text-white" id="progress-hud">
+<h3 class="text-sm font-bold mb-2 text-center text-white">Progresso</h3>
+<div class="hud-text">Tempo: <span id="time-display">00:00</span></div>
+<div class="hud-text">Nível: <span id="level-display">1</span></div>
+<div class="mb-1">
+<div class="hud-text">XP: <span class="text-yellow-400" id="xp-display">0</span> / <span id="xp-needed-display">10</span></div>
+<div class="bar-bg">
+<div class="bar-fill" id="xp-bar" style="width: 0%;"></div>
+</div>
+</div>
+<div class="hud-text">Gemas: <span class="text-purple-400" id="grapes-display">0</span></div>
+<div class="hud-text">Derrotados: <span id="enemies-defeated-display">0</span></div>
+</div>
+
+<div class="hud-panel text-white" id="status-hud">
+<h3 class="text-sm font-bold mb-2 text-center">Status</h3>
+<div class="hud-text text-center mb-2" id="class-display-hud">
+    <span id="class-icon-hud">🎓</span> <span id="class-name-hud">Aprendiz</span>
+</div>
+<div class="mb-1">
+<div class="hud-text">HP: <span class="text-red-500" id="hp-value">100</span>/<span id="max-hp-value">100</span></div>
+<div class="bar-bg" id="hp-bar-bg">
+<div class="bar-fill" id="hp-bar" style="width: 100%;"></div>
+</div>
+</div>
+<div>
+<div class="hud-text">SP: <span class="text-blue-400" id="sp-value">100</span>/<span id="max-sp-value">100</span></div>
+<div class="bar-bg" id="sp-bar-bg">
+<div class="bar-fill bg-blue-500" id="sp-bar" style="width: 100%;"></div>
+</div>
+</div>
+</div>
+
+<div class="hud-panel text-white" id="passive-weapons-hud">
+    <h3 class="text-sm font-bold mb-2 text-center">Armas Passivas</h3>
+    <div class="flex gap-2 justify-center">
+        <div class="passive-weapon-slot" id="passive-weapon-slot-1">
+            <span class="tooltip-text"></span> </div>
+        <div class="passive-weapon-slot" id="passive-weapon-slot-2">
+            <span class="tooltip-text"></span> </div>
+		<div class="passive-weapon-slot" id="passive-weapon-slot-3">
+            <span class="tooltip-text"></span> </div>
+        </div>
+</div>
+<div id="upgrade-toast-container"></div>
+
+<div class="hud-panel w-48 text-white" id="attributes-hud">
+<h3 class="text-sm font-bold mb-2 text-center text-white">Atributos</h3>
+<div class="hud-text">Dano Base: <span class="" id="dmg-display">1.0</span></div>
+<div class="hud-text">Ataques/s: <span class="" id="aspd-display">1.5</span></div>
+<div class="hud-text">Veloc. Mov.: <span class="" id="ms-display">1.5</span></div>
+<div class="hud-text">Chance Crít.: <span id="crit-c-display">1%</span></div>
+<div class="hud-text">Dano Crít.: <span id="crit-d-display">200%</span></div>
+<div class="hud-text border-t border-gray-600 mt-2 pt-2">
+<span class="text-green-400 font-bold">DPS (Agregado):</span> <span class="text-green-400" id="dps-display">0.0</span>
+</div>
+</div>
+
+<div class="hud-panel text-white" id="powerup-hud">
+    <div class="hud-text text-center">
+        Brindes: <span class="text-yellow-300" id="powerup-stacks-display">0</span> ⭐
+    </div>
+    <div class="hud-text text-center text-xs">(Use: T)</div>
+</div>
+
+<button class="utility-button" id="pause-btn">PAUSAR</button>
+<div id="abilities-hud">
+<button class="ability-btn" id="dash-btn">
+                <span id="dash-label">DASH (Q)</span>
+                <span id="dash-cost-display" class="text-xs text-amber-300">SP: 20</span>
+<div class="ability-cooldown hidden" id="dash-cd"></div>
+<span class="tooltip-text">Movimento rápido para se afastar ou atravessar inimigos. Garante **invulnerabilidade** por 0.1s.<br><span class='text-gray-300'>Cooldown: 10 segundos.</span></span>
+</button>
+<button class="ability-btn" id="impact-btn">
+                <span id="impact-label">Impacto (W)</span>
+                <span id="impact-cost-display" class="text-xs text-amber-300">SP: 30</span>
+<div class="ability-cooldown hidden" id="impact-cd"></div>
+<span class="tooltip-text">Causa **dano em área** duas vezes seguidas (pequeno atraso). O dano é baseado no seu **Dano Base**.<br><span class='text-gray-300'>Cooldown: 10 segundos.</span></span>
+</button>
+<button class="ability-btn" id="berserk-btn">
+                <span id="berserk-label">Berserk (E)</span>
+                <span id="berserk-cost-display" class="text-xs text-amber-300">SP: 40</span>
+<div class="ability-cooldown hidden" id="berserk-cd"></div>
+<span class="tooltip-text">Aumenta drasticamente o **ASPD (3x)**, **Veloc. Mov. (2x)** e **Dano (1.6x)** por **4 segundos**.<br><span class='text-gray-300'>Cooldown: 15 segundos.</span></span>
+</button>
+</div>
+
+<div id="achievement-container"></div>
+
+<div id="special-enemy-alert" class="hidden">
+    <h2 id="special-enemy-alert-text"></h2>
+</div>
+
+<div class="overlay-screen visible" id="start-screen">
+<div id="start-screen-skin">🐯</div>
+
+    <h1 class="text-5xl mb-8 text-white">BICHOS & OSSOS</h1>
+
+    <div class="flex flex-col gap-4 w-full max-w-xs animate-fade-in-slide-up" style="animation-delay: 0.3s;">
+        </div>
+
+        <button class="main-button mb-4" id="start-button">▶️ Jogar</button>
+
+        <div class="flex flex-col gap-3 p-4 bg-black/20 rounded-lg border border-gray-700">
+            <button class="utility-button" id="open-store-btn">
+                💠 Loja / Melhorias
+            </button>
+            <button class="utility-button" id="open-achievements-btn">
+                🏆 Conquistas
+            </button>
+            <button class="utility-button" id="open-codex-btn">
+                📜 Códice
+            </button>
+            <button class="utility-button" id="open-settings-btn">
+                ⚙️ Configurações
+            </button>
+        </div>
+
+		<button class="utility-button mt-4" id="exit-game-btn">
+                🚪 Sair
+            </button>
+    
+        <div class="mt-8 text-center animate-fade-in-slide-up" style="animation-delay: 0.5s;">
+          <p class="text-sm text-gray-400">Seu 🐯 ataca e detecta inimigos automaticamente.</p>
+          <p class="mt-1 text-sm text-yellow-300">
+              Colete 💠 para recuperar HP/SP e ⭐ para acumular Brindes (Aprimoramentos)!
+          </p>
+        </div>
+	</div> <div class="overlay-screen" id="pause-screen">
+
+<h1 class="text-6xl text-white">PAUSADO</h1>
+
+<div class="flex flex-col gap-4 mt-8">
+    <button class="main-button" id="resume-game-btn">Retornar ao Jogo</button>
+    <button class="utility-button" id="open-settings-pause-btn">
+        Configurações
+    </button>
+    <button class="utility-button" id="exit-match-btn" style="background-color: #ef4444; border-color: #b91c1c; border-bottom-color: #b91c1c; box-shadow: 0 3px #b91c1c;">
+        Sair da Partida
+    </button>
+</div>
+
+<div class="mt-8 text-lg text-gray-300 text-center">
+<p class="mt-4" id="pause-controls-text">Controles: Q (Dash), W (Impacto), E (Berserk), T (Brinde)</p>
+
+<p class="mt-6 text-xl text-white">
+    Dificuldade Atual: <span id="pause-difficulty-display">100.0%</span>
+</p>
+
+<div class="mt-6 p-4 border-2 border-gray-700 rounded-lg bg-gray-800 text-base text-left w-64 mx-auto">
+    <h4 class="text-lg font-bold text-center mb-2 text-white">Estatísticas da Partida</h4>
+    <div class="hud-text">Tempo: <span id="pause-stats-time">00:00</span></div>
+    <div class="hud-text">Derrotados: <span id="pause-stats-defeated">0</span></div>
+    <div class="hud-text">Gemas: <span id="pause-stats-grapes">0</span></div>
+    <div class="hud-text">DPS (1s): <span id="pause-stats-dps">0.0</span></div>
+    <div class="hud-text">Nível: <span id="pause-stats-level">1</span></div>
+</div>
+</div>
+<div class="absolute bottom-5 right-5 flex items-center gap-3 bg-gray-900/50 p-2 rounded-lg">
+    <button id="mute-btn-pause" class="mute-btn text-2xl">🔊</button>
+    <input type="range" id="volume-slider-pause" min="0" max="1" step="0.01" class="volume-slider">
+</div>
+</div>
+
+<div class="overlay-screen" id="tutorial-tip-screen">
+    <h2 id="tutorial-tip-title" class="text-3xl text-yellow-300 mb-6"></h2>
+    <p id="tutorial-tip-text" class_name="mt-4 text-lg text-center max-w-lg px-4"></p>
+    <button id="tutorial-tip-close" class="utility-button mt-8">Entendi!</button>
+</div>
+
+<div class="overlay-screen" id="level-up-screen">
+<h1 class="text-4xl mb-8 text-white">NOVO NÍVEL! Escolha um Aprimoramento:</h1>
+<div class="flex flex-col md:flex-row gap-4" id="upgrade-options">
+</div>
+<button class="utility-button mt-6" id="reroll-button">Girar (5💠)</button>
+<button class="utility-button mt-4" id="skip-upgrade-button">Pular (Ganha 5💠)</button>
+</div>
+
+<div class="overlay-screen" id="game-over-screen">
+    <h1 class="text-6xl text-red-500 mb-8">FIM DE JOGO</h1>
+    <p class="text-2xl mb-8">Sua Pontuação: <span id="final-score">0</span></p>
+
+    <div class="mb-8 p-4 border-2 border-gray-700 rounded-lg bg-gray-900 text-lg text-left w-72">
+        <h4 class="text-xl font-bold text-center mb-3 text-white">Resumo da Partida</h4>
+        <div class="hud-text">Tempo Sobrevivido: <span id="game-over-stats-time">00:00</span></div>
+        <div class="hud-text">Inimigos Derrotados: <span id="game-over-stats-defeated">0</span></div>
+        <div class="hud-text">Nível Alcançado: <span id="game-over-stats-level">1</span></div>
+        <div class="hud-text">Dificuldade Final: <span id="game-over-stats-difficulty">100.0%</span></div>
+        <div class="hud-text text-lg border-t border-gray-600 mt-2 pt-2 text-purple-300">
+            Gemas no Banco: <span id="game-over-grapes-bank">0</span> 💠
+        </div>
+    </div>
+    <div class="flex flex-col gap-4">
+        <button class="main-button" id="restart-button">Jogar Novamente</button>
+        <button class="utility-button" id="open-meta-store-gameover-btn">
+            💠 Loja / Melhorias
+        </button>
+        <button class="utility-button" id="back-to-menu-btn">
+            Voltar ao Menu
+        </button>
+    </div>
+    <div class="absolute bottom-5 right-5 flex items-center gap-3 bg-gray-900/50 p-2 rounded-lg">
+        <button id="mute-btn-gameover" class="mute-btn text-2xl">🔊</button>
+        <input type="range" id="volume-slider-gameover" min="0" max="1" step="0.01" class="volume-slider">
+    </div>
+</div>
+
+<div class="overlay-screen" id="settings-screen">
+    <h1 class="text-4xl mb-8 text-white">Configurações</h1>
+    <div class="flex flex-col gap-6 w-full max-w-xs">
+        
+        <div class="flex items-center justify-between gap-3 bg-gray-800 p-4 rounded-lg">
+            <label for="volume-slider-settings" class="text-white text-lg">Volume:</label>
+            <button id="mute-btn-settings" class="mute-btn text-2xl">🔊</button>
+            <input type="range" id="volume-slider-settings" min="0" max="1" step="0.01" class="volume-slider" style="width: 150px;">
+        </div>
+
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <label class="text-white text-lg mb-3 block text-center">Controles:</label>
+            <div class="flex gap-4">
+                <button class="utility-button flex-1" id="set-controls-mouse">Mouse + QWET</button>
+                <button class="utility-button flex-1" id="set-controls-wasd">WASD + Shift/Q</button>
+            </div>
+        </div>
+
+        <button class="utility-button" id="fullscreen-btn-settings">TELA CHEIA</button>
+    </div>
+    
+    <button class="main-button mt-12" id="settings-back-btn">Voltar</button>
+</div>
+
+
+<div class="overlay-screen scale-90" id="store-screen"> <h1 class="text-4xl mb-4 text-white" id="store-title-text">Melhorias Permanentes</h1>
+    
+    <div class="flex justify-between items-center w-full max-w-6xl mb-4 px-4">
+    
+        <button class="utility-button" id="store-close-btn">Voltar</button>
+
+        <div class="store-header-info">
+            <p class="text-2xl text-center">
+                Gemas no Banco: 
+                <span class="text-purple-300 font-bold" id="store-grapes-bank-display">0</span> 💠
+            </p>
+            <div id="skin-xp-bonus-container" class="hidden">
+                <p class="text-sm text-yellow-300 text-center">
+                    Bônus de XP (Skins): 
+                    <span class="font-bold" id="skin-xp-bonus-display">+0%</span>
+                </p>
+            </div>
+        </div>
+
+        <button class="utility-button" id="reset-meta-upgrades-btn" style="background-color: #ef4444; border-color: #b91c1c; border-bottom-color: #b91c1c; box-shadow: 0 3px #b91c1c;">
+            🗑️ Resetar (100% 💠)
+        </button>
+        
+    </div>
+
+    <div class="store-tabs">
+        <button class="utility-button active-setting" id="tab-btn-meta">💠 Melhorias</button>
+        <button class="utility-button" id="tab-btn-skins">👕 Skins</button>
+    </div>
+
+    <div id="meta-upgrade-content" class="store-content w-full max-w-6xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-1 w-full" id="meta-upgrade-options">
+            </div>
+    </div>
+    
+    <div id="skin-store-content" class="store-content hidden w-full max-w-6xl">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full" id="skin-store-options">
+            </div>
+    </div>
+
+</div>
+
+<div class="overlay-screen scale-90" id="codex-screen"> 
+    
+    <div class="codex-header-info mb-4 px-4">
+        <button class="utility-button" id="codex-close-btn">Voltar</button>
+        <h1 class="text-4xl text-white">📜 Códice 📜</h1>
+    </div>
+
+    <div class="store-tabs">
+        <button class="utility-button active-setting" id="tab-btn-enemies">👹 Inimigos</button>
+        <button class="utility-button" id="tab-btn-weapons">⚔️ Armas</button>
+        <button class="utility-button" id="tab-btn-items">✨ Itens</button>
+    </div>
+
+    <div id="codex-enemies-content" class="store-content w-full max-w-6xl overflow-y-auto" style="max-height: 65vh;">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full" id="codex-enemies-grid">
+            </div>
+    </div>
+    
+    <div id="codex-weapons-content" class="store-content hidden w-full max-w-6xl overflow-y-auto" style="max-height: 65vh;">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full" id="codex-weapons-grid">
+            </div>
+    </div>
+    
+    <div id="codex-items-content" class="store-content hidden w-full max-w-6xl overflow-y-auto" style="max-height: 65vh;">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full" id="codex-items-grid">
+            </div>
+    </div>
+
+</div>
+<div class="overlay-screen scale-90" id="achievements-screen"> 
+    
+    <div class="codex-header-info mb-4 px-4">
+        <button class="utility-button" id="achievements-close-btn">Voltar</button>
+        <h1 class="text-4xl text-white">🏆 Conquistas 🏆</h1>
+    </div>
+
+    <div id="achievements-list-container" class="store-content w-full max-w-4xl overflow-y-auto" style="max-height: 75vh;">
+        <div class="flex flex-col gap-2 w-full" id="achievements-list">
+            </div>
+    </div>
+    
+</div>
+</div>
+
+	<audio id="bgm-audio" loop preload="auto">
+        <source src="assets/sounds/TrilhaSonora.ogg" type="audio/ogg">
+        <source src="assets/sounds/TrilhaSonora.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+
+<script src="utils.js"></script>
+<script src="definitions.js"></script>
+<script src="classes.js"></script>
+<script src="ui.js"></script>
+<script src="logic.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>

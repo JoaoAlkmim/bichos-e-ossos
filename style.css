@@ -1,0 +1,1307 @@
+/* INÍCIO DA PALETA - "OURO GÓTICO" */
+:root {
+    --pixel-font: 'Silkscreen', sans-serif; /* Fonte Pixel */
+    --main-bg: #1a1a2e; /* Fundo: Roxo/Índigo Muito Escuro */
+    --hud-bg: #2a2a4e; /* HUD: Roxo/Ardósia Escuro */
+    --hud-border: #4a4a7a; /* Borda: Roxo/Cinza Médio */
+    --action-color: #f5bd1f; /* Ação: Ouro Vibrante */
+    --action-border: #b88a00; /* Borda Ação: Ouro Escuro */
+    --button-main-hover: #ffe17a; /* Hover Ação: Ouro Claro */
+}
+body {
+    background-color: var(--main-bg);
+    font-family: var(--pixel-font);
+	color: #f0f0f8; /* Branco levemente Lavanda (mais suave) */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+#game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border: 4px solid var(--hud-border);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+#game-container::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(239, 68, 68, 1.0); /* Vermelho sólido */
+	opacity: 0; /* Começa invisível */
+	pointer-events: none; /* Não bloqueia cliques */
+	z-index: 300; /* Acima de tudo (para cobrir o jogo) */
+}
+#game-canvas {
+    background-color: #000;
+    flex-grow: 1;
+    width: 100%;
+    cursor: pointer;
+}
+.hud-panel {
+    background-color: var(--hud-bg);
+    border: 2px solid var(--hud-border);
+    padding: 8px;
+    border-radius: 10px 10px 2px 2px;
+    box-shadow: 0 4px #000;
+    transition: all 0.5s ease-in-out;
+}
+.hud-text {
+    font-size: 0.875rem;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+.hud-panel h3 {
+     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#class-display-hud { /* Indicador de classe */
+    font-weight: bold;
+    font-size: 0.9rem; /* Um pouco maior que o hud-text normal */
+    color: #f59e0b; /* Cor Âmbar/Dourado */
+    text-shadow: 0 0 5px rgba(245, 158, 11, 0.7);
+    border-bottom: 1px solid var(--hud-border);
+    padding-bottom: 6px;
+    margin-bottom: 6px !important;
+}
+
+.bar-bg {
+    height: 10px;
+    background-color: #374151;
+    border-radius: 4px;
+    margin-top: 2px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+.bar-fill {
+    height: 100%;
+	transition: width 0.2s ease-out; /* Duração e tipo de suavização */
+    border-radius: 4px;
+}
+#hp-bar {
+    background-image: linear-gradient(to right, #b91c1c, #dc2626); /* Red-700 para Red-600 */
+}
+.hp-full-glow {
+    box-shadow: 0 0 8px 1px rgba(220, 38, 38, 0.7);
+}
+#xp-bar {
+    background-image: linear-gradient(to right, #facc15, #f59e0b); /* Yellow-400 para Amber-500 */
+}
+@keyframes pulse-xp {
+    0% { transform: scaleX(1); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7); }
+    50% { transform: scaleX(1.05); box-shadow: 0 0 15px 5px rgba(250, 204, 21, 0.9); }
+    100% { transform: scaleX(1); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7); }
+}
+.xp-level-up-pulse {
+    animation: pulse-xp 0.5s ease-out;
+}
+/* Animação para os painéis da HUD */
+@keyframes pulse-danger-panel {
+    0% {
+        /* O box-shadow que você gostou */
+        box-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
+    }
+}
+
+/* Animação para o flash de tela cheia */
+@keyframes pulse-flash-danger {
+    0% {
+        opacity: 0; /* Completamente transparente */
+    }
+    50% {
+        opacity: 0.20; /* Flash vermelho de 20% */
+    }
+    100% {
+        opacity: 0; /* Completamente transparente */
+    }
+}
+
+/* Esta classe .low-hp-pulse será aplicada a AMBOS (hud e container) */
+.low-hp-pulse {
+    border-color: #ef4444 !important;
+}
+
+/* Animação específica para os PAINÉIS (ex: #status-hud) */
+.hud-panel.low-hp-pulse {
+    animation: pulse-danger-panel 1s infinite alternate;
+}
+
+/* Animação específica para a TELA CHEIA (ativando o ::after) */
+#game-container.low-hp-pulse::after {
+    animation: pulse-flash-danger 1s infinite alternate;
+}
+
+#progress-hud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+#status-hud {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    min-width: 250px;
+}
+#attributes-hud {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+#powerup-hud { /* HUD de brindes */
+     position: absolute;
+     bottom: 220px;
+     right: 10px;
+     text-align: right;
+     width: 170px;
+}
+
+#passive-weapons-hud { /* HUD de Armas Passivas */
+     position: absolute;
+     bottom: 162px;
+     left: 10px;
+     width: 170px;
+}
+.passive-weapon-slot {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 2px solid var(--hud-border);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.75rem; /* 12px */
+    color: #d1d5db; /* Gray-300 */
+    transition: border-color 0.2s ease;
+    position: relative;
+}
+.passive-weapon-slot .emoji {
+    font-size: 2rem; /* 32px */
+    line-height: 1;
+}
+.passive-weapon-slot .level {
+    font-weight: bold;
+    color: var(--action-color); /* Dourado */
+    margin-top: 4px;
+}
+/* Texto Vazio (Slot não preenchido) */
+.passive-weapon-slot:empty::before {
+    content: '-';
+    font-size: 2.5rem;
+    color: var(--hud-border);
+    line-height: 1;
+}
+
+/* --- Estilo do Tooltip da Arma Passiva --- */
+.passive-weapon-slot .tooltip-text {
+    visibility: hidden;
+    background-color: #374151; /* Mesmo do ability-btn */
+    color: #fff;
+    text-align: left;
+    border-radius: 4px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 10;
+    bottom: 105%; /* Posição acima do slot */
+    left: 0; /* Alinha à esquerda do slot */
+    transform: translateX(0); /* Sem translação horizontal */
+    width: max-content;
+    max-width: 250px;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    pointer-events: none;
+    border: 1px solid #9ca3af;
+}
+.passive-weapon-slot .tooltip-text strong {
+     color: var(--action-color); /* Dourado */
+     font-weight: bold;
+     display: block; /* Faz o nome ficar em linha própria */
+     margin-bottom: 4px;
+}
+.passive-weapon-slot:hover .tooltip-text {
+    visibility: visible;
+}
+
+#pause-btn {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 101;
+}
+#fullscreen-btn { /* Este ID pode não existir mais no seu HTML se removeu o botão duplicado */
+    position: absolute;
+    top: 10px;
+    right: 110px;
+}
+#abilities-hud {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+.ability-btn {
+    padding: 8px 12px;
+    background-color: var(--hud-bg);
+    color: white;
+    border: 2px solid var(--hud-border);
+    border-bottom: 4px solid var(--hud-border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.1s, transform 0.1s, box-shadow 0.3s;
+    font-size: 0.875rem;
+    line-height: 1;
+    user-select: none;
+    position: relative;
+}
+.ability-btn:hover:not(.disabled) {
+	background-color: var(--hud-border); /* (Usa a cor da borda para hover) */
+}
+.ability-btn:active:not(.disabled) {
+    transform: translateY(2px);
+	border-bottom: 2px solid var(--hud-border);
+}
+.ability-btn.disabled {
+    background-color: #4b5563;
+    cursor: not-allowed;
+}
+.ability-cooldown {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    transition: all 0.1s;
+}
+.tooltip-text {
+    visibility: hidden;
+    background-color: #374151;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 10;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 250px;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    pointer-events: none;
+    border: 1px solid #9ca3af;
+}
+.ability-btn:hover .tooltip-text {
+    visibility: visible;
+}
+.berserk-attribute-glow {
+    color: #f97316; /* Orange-500 */
+    text-shadow: 0 0 5px rgba(249, 115, 22, 0.8);
+    transition: color 0.1s;
+}
+
+/* Estilo para Telas de Overlay (COM TRANSIÇÃO) */
+.overlay-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 26, 46, 0.7); /* var(--main-bg) com 70% opacidade */
+    backdrop-filter: blur(5px); /* Desfoca o que está atrás */
+
+    display: flex; /* Usar flex para centralizar */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: scale(0.95); /* Começa um pouco menor */
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+
+    /* ---> Vignette (Aplicada a todas as overlays) <--- */
+    box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.4);
+
+    /* ---> Fundo Sutil (Aplicado a todas as overlays) <--- */
+    background-image: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 70%);
+}
+
+/* Classe 'visible' que ativa o overlay */
+.overlay-screen.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scale(1); /* Cresce para o tamanho normal */
+}
+
+.main-button {
+    padding: 16px 32px;
+    font-size: 1.25rem;
+    background-color: var(--action-color);
+    color: var(--main-bg);
+    border: 4px solid var(--action-border);
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 6px var(--action-border);
+    transition: all 0.1s ease; /* Transição suave */
+}
+.main-button:hover {
+    background-color: var(--button-main-hover);
+    transform: scale(1.05); /* Aumenta o botão */
+}
+.main-button:active {
+    transform: translateY(2px) scale(1.03); /* Ajusta o active */
+    box-shadow: 0 4px var(--action-border);
+}
+
+/* Regra base do botão utilitário */
+.utility-button {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    background-color: #4b5563; /* Gray-600 */
+    color: white;
+    border: 2px solid #374151; /* Gray-700 */
+    border-bottom: 4px solid #374151;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 3px #374151;
+    /* --- AJUSTE NA TRANSIÇÃO --- */
+    transition: all 0.2s ease; /* Inclui filter e aumenta um pouco */
+}
+/* Regra de Hover */
+.utility-button:hover:not(.disabled):not(.active-setting) {
+    background-color: #6b7280; /* Gray-500 */
+    transform: scale(1.05); /* Aumenta o botão */
+    /* --- ADIÇÃO DO BRILHO --- */
+    filter: brightness(1.15);
+}
+.utility-button:active:not(.disabled) {
+    transform: translateY(2px) scale(1.03); /* Ajusta o active */
+    border-bottom: 2px solid #374151;
+    box-shadow: 0 1px #374151;
+}
+
+.utility-button.disabled {
+    background-color: #4b5563;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Estilo para botão de controle ativo */
+.utility-button.active-setting {
+    background-color: var(--action-color);
+    border-color: var(--action-border);
+    color: var(--main-bg);
+    box-shadow: 0 3px var(--action-border);
+    opacity: 1;
+    cursor: default;
+}
+.utility-button.active-setting:hover {
+    background-color: var(--action-color);
+    transform: scale(1); /* Não aumenta quando ativo */
+}
+
+
+.upgrade-option {
+    background-color: #4b5563;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s; /* Transição suave para tudo */
+    text-align: center;
+    border: 4px solid #6b7280;
+    width: 100%;
+    max-width: 250px;
+    position: relative;
+}
+
+/* Efeito de hover geral e específico por categoria */
+.upgrade-option:hover {
+    background-color: #6b7280;
+    transform: scale(1.03); /* Aumenta o card */
+    box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.3);
+}
+.upgrade-option.category-ofensivo:hover { box-shadow: 0 0 15px 5px rgba(239, 68, 68, 0.5); }
+.upgrade-option.category-defensivo:hover { box-shadow: 0 0 15px 5px rgba(34, 197, 94, 0.5); }
+.upgrade-option.category-utilidade:hover { box-shadow: 0 0 15px 5px rgba(59, 130, 246, 0.5); }
+.upgrade-option.category-critico:hover { box-shadow: 0 0 15px 5px rgba(245, 158, 11, 0.6); }
+.upgrade-option.category-especial:hover { box-shadow: 0 0 15px 5px rgba(168, 85, 247, 0.5); }
+.upgrade-option.category-arma:hover { box-shadow: 0 0 15px 5px rgba(245, 189, 31, 0.6); }
+
+
+.sp-regen-glow {
+    box-shadow: 0 0 8px 3px rgba(59, 130, 246, 0.7);
+}
+
+.berserk-active {
+	box-shadow: 0 0 15px 5px var(--action-color);
+}
+
+.floating-text {
+    position: absolute;
+    font-size: 14px;
+    font-weight: bold;
+    pointer-events: none;
+    animation: floatup 1s ease-out forwards;
+    white-space: nowrap;
+    z-index: 50;
+}
+.damage-player { color: #ef4444; } /* Red */
+.damage-crit { color: #facc15; } /* Yellow */
+.damage-normal { color: #ffffff; }
+.drop-upgrade {
+    color: #06f79a; /* Cor de Ação */
+    font-size: 18px;
+    text-shadow: 0 0 8px rgba(6, 247, 154, 0.9);
+}
+
+@keyframes floatup {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-50px); }
+}
+
+@media (max-width: 768px) {
+    .hud-panel {
+        padding: 4px;
+        font-size: 0.6rem;
+    }
+    .hud-text {
+        font-size: 0.75rem;
+        margin-bottom: 2px;
+    }
+    .ability-btn {
+        padding: 6px 8px;
+        font-size: 0.6rem;
+    }
+    /* Ajuste de Responsividade com clamp() */
+    #progress-hud {
+         width: clamp(140px, 30vw, 192px);
+    }
+    #attributes-hud {
+        width: clamp(140px, 30vw, 192px); /* w-48 */
+        min-width: unset;
+    }
+     #status-hud {
+        width: clamp(140px, 30vw, 250px);
+        min-width: unset;
+    }
+	/* Ajuste HUD Brindes */
+    #powerup-hud {
+        width: clamp(140px, 30vw, 170px);
+        bottom: 160px;
+        font-size: 0.75rem;
+        padding: 4px;
+    }
+
+    /* Ajuste HUD Armas Passivas */
+    #passive-weapons-hud {
+        width: clamp(140px, 30vw, 170px);
+        bottom: 160px; /* Espelha o powerup-hud */
+        left: 10px;
+        font-size: 0.75rem;
+        padding: 4px;
+    }
+    .passive-weapon-slot {
+        width: 48px;
+        height: 48px;
+    }
+    .passive-weapon-slot .emoji {
+        font-size: 1.5rem; /* 24px */
+    }
+    .passive-weapon-slot:empty::before {
+        font-size: 2rem;
+    }
+
+    /* --- Ajuste Tooltip Armas Móvel --- */
+    .passive-weapon-slot .tooltip-text {
+        /* Em telas pequenas, força o tooltip a ir para a DIREITA */
+        left: 105%; /* Posição à direita do slot */
+        bottom: 50%; /* Centraliza verticalmente */
+        transform: translateY(50%); /* Centraliza verticalmente */
+    }
+
+    /* Ajuste Toast Container (Móvel) */
+    #upgrade-toast-container {
+        bottom: 200px; /* Posição acima do HUD de Brindes móvel */
+    }
+
+    #pause-btn {
+        top: 5px;
+        right: 5px;
+        padding: 6px 8px;
+    }
+    #fullscreen-btn { /* Este ID pode não existir mais */
+        top: 5px;
+        right: 80px;
+        padding: 6px 8px;
+    }
+}
+
+
+/* ========================================= */
+/* = AJUSTE NO TAMAN.DA LOJA (FONTE PIXEL) = */
+/* ========================================= */
+
+/* 1. Reduz o tamanho da fonte do título e da descrição */
+#store-screen .meta-upgrade-info h4 {
+	font-size: 1rem; /* Era 1.125rem (18px) */
+}
+#store-screen .meta-upgrade-info p {
+	font-size: 0.8125rem; /* Era 0.875rem (14px) */
+}
+
+/* 2. Permite que o botão quebre a linha e ajusta o padding */
+#store-screen .meta-upgrade-button {
+	white-space: normal;  /* Remove o 'nowrap' que força o botão a ser largo */
+	text-align: center;   /* Centraliza o texto se ele quebrar em 2 linhas */
+	padding: 8px 12px;    /* Reduz um pouco o padding */
+	font-size: 0.8125rem; /* Reduz a fonte do botão */
+	min-width: 110px;     /* Garante uma largura mínima */
+}
+
+/* ===== FEEDBACK ANIMATIONS (HUD) ===== */
+@keyframes xp-glow {
+  0% { filter: brightness(1); text-shadow: 0 0 0px #facc15; }
+  50% { filter: brightness(2); text-shadow: 0 0 10px #facc15; }
+  100% { filter: brightness(1); text-shadow: 0 0 0px #facc15; }
+}
+.xp-glow {
+  animation: xp-glow 0.2s ease-in-out;
+}
+@keyframes hp-flash {
+  0%, 100% { color: #ef4444; }
+  50% { color: #ffffff; text-shadow: 0 0 6px #ef4444; }
+}
+.hp-flash {
+  animation: hp-flash 0.3s ease-in-out;
+}
+@keyframes pop-scale {
+  0% { transform: scale(1); filter: brightness(1); }
+  40% { transform: scale(1.4); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.pop-scale {
+  animation: pop-scale 0.3s ease-out;
+}
+@keyframes level-glow {
+  0%, 100% { text-shadow: 0 0 0px #06f79a; }
+  50% { text-shadow: 0 0 10px #06f79a; filter: brightness(1.8); }
+}
+.level-glow {
+  animation: level-glow 0.4s ease-in-out;
+}
+
+/* ===== CONQUISTAS TEMPORÁRIAS ===== */
+#achievement-container {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+.achievement {
+  background: rgba(31, 41, 55, 0.9);
+  border: 2px solid #06f79a;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 10px;
+  margin-top: 6px;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+.achievement.show { opacity: 1; transform: translateY(0); }
+.achievement.hide { opacity: 0; transform: translateY(-20px); }
+
+/* ===== DESTAQUE HABILIDADE PRONTA (OURO) ===== */
+@keyframes pulse-ready {
+	0% {
+		/* Cor da --action-color (Ouro) com 40% opacidade */
+		box-shadow: 0 0 5px rgba(245, 189, 31, 0.4);
+	}
+	50% {
+		/* Cor da --action-color (Ouro) com 80% opacidade */
+		box-shadow: 0 0 12px 3px rgba(245, 189, 31, 0.8);
+	}
+	100% {
+		/* Cor da --action-color (Ouro) com 40% opacidade */
+		box-shadow: 0 0 5px rgba(245, 189, 31, 0.4);
+	}
+}
+.ability-btn:not(.disabled) {
+    animation: pulse-ready 1.5s infinite;
+}
+
+/* ===== CATEGORIAS DE UPGRADE (BORDAS) ===== */
+.category-ofensivo { border-color: #ef4444; } /* Vermelho */
+.category-defensivo { border-color: #22c55e; } /* Verde */
+.category-utilidade { border-color: #3b82f6; } /* Azul */
+.category-critico { border-color: #f59e0b; } /* Âmbar/Dourado */
+.category-especial { border-color: #a855f7; } /* Roxo */
+.category-default { border-color: #6b7280; } /* Cinza (padrão) */
+
+/* CATEGORIA DE ARMA PASSIVA */
+.category-arma { border-color: #f5bd1f; } /* Ouro (Cor de Ação) */
+
+/* ===== FEEDBACK DE HABILIDADE (FALHA) ===== */
+@keyframes shake-button {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+.shake-button {
+  animation: shake-button 0.3s ease-in-out;
+}
+@keyframes sp-flash-danger {
+  0%, 100% { box-shadow: 0 0 8px 3px rgba(59, 130, 246, 0.7); } /* Default glow */
+  50% { box-shadow: 0 0 15px 5px rgba(239, 68, 68, 0.9); } /* Red flash */
+}
+.sp-flash-danger {
+  animation: sp-flash-danger 0.2s ease-out;
+}
+@keyframes pulse-low-sp {
+    0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
+    50% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
+}
+.low-sp-pulse {
+    border: 1px solid #ef4444;
+    animation: pulse-low-sp 1s infinite alternate;
+}
+
+/* ===== TAG DE CATEGORIA UPGRADE ===== */
+.upgrade-category-tag {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 2px;
+    border-radius: 2px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.tag-ofensivo { color: #ef4444; }
+.tag-defensivo { color: #22c55e; }
+.tag-utilidade { color: #3b82f6; }
+.tag-critico { color: #f59e0b; }
+.tag-especial { color: #a855f7; }
+.tag-default { color: #9ca3af; }
+/* TAG DE ARMA PASSIVA */
+.tag-arma { color: #f5bd1f; }
+
+/* ===== ALERTA DE INIMIGO ESPECIAL ===== */
+#special-enemy-alert {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 201;
+    background: rgba(150, 0, 0, 0.5);
+    border: 4px solid #ef4444;
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: all 0.5s ease;
+    pointer-events: none;
+}
+#special-enemy-alert.show {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.1);
+}
+#special-enemy-alert.hide {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.9);
+}
+#special-enemy-alert.hidden {
+    display: none;
+}
+
+/* ===== BRINDE DE UPGRADE (TOAST) ===== */
+#upgrade-toast-container {
+  position: absolute;
+  bottom: 290px; /* Acima do HUD de Brindes */
+  right: 10px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+.upgrade-toast {
+  background: rgba(31, 41, 55, 0.9);
+  border: 2px solid #f59e0b;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 10px;
+  margin-top: 6px;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+.upgrade-toast.show { opacity: 1; transform: translateX(0); }
+.upgrade-toast.hide { opacity: 0; transform: translateX(20px); }
+.upgrade-toast.category-ofensivo { border-color: #ef4444; }
+.upgrade-toast.category-defensivo { border-color: #22c55e; }
+.upgrade-toast.category-utilidade { border-color: #3b82f6; }
+.upgrade-toast.category-critico { border-color: #f59e0b; }
+.upgrade-toast.category-especial { border-color: #a855f7; }
+.upgrade-toast.category-default { border-color: #6b7280; }
+/* TOAST DE ARMA PASSIVA */
+.upgrade-toast.category-arma { border-color: #f5bd1f; }
+
+
+/* ===== FLASH PAINEL STATUS (AO TOMAR DANO) ===== */
+@keyframes panel-hurt-flash {
+  0%, 100% {
+    border-color: var(--hud-border);
+    transform: scale(1);
+  }
+  50% {
+    border-color: #ef4444;
+    transform: scale(1.02);
+  }
+}
+.panel-hurt {
+  animation: panel-hurt-flash 0.2s ease-out;
+}
+
+/* ===== ESCONDE HUD DURANTE LEVEL UP OU PAUSA ===== */
+.game-level-up .hud-panel,
+.game-level-up #abilities-hud,
+.game-level-up #pause-btn,
+.game-level-up #fullscreen-btn, /* Este ID pode não existir mais */
+.game-paused #pause-btn { /* Mantém o botão de despausar visível */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+/* Correção: Garante que o botão de despausar fique visível na pausa */
+#pause-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+/* ===== ESTILOS DA LOJA DE METAPROGRESSÃO ===== */
+.meta-upgrade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--hud-bg);
+    border: 2px solid var(--hud-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    width: 100%;
+}
+.meta-upgrade-info {
+    flex-grow: 1;
+    margin-right: 16px;
+}
+.meta-upgrade-info h4 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+.meta-upgrade-info p {
+    font-size: 0.875rem;
+    color: #d1d5db; /* Gray-300 */
+}
+.meta-upgrade-info .level {
+    font-size: 0.75rem;
+    color: var(--action-color);
+    font-weight: bold;
+}
+
+.meta-upgrade-button {
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    background-color: #f59e0b; /* Amber-500 */
+    color: var(--main-bg);
+    border: 2px solid #b45309; /* Amber-700 */
+    border-bottom: 4px solid #b45309;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: all 0.1s;
+}
+.meta-upgrade-button:hover:not(.disabled) {
+    background-color: #facc15; /* Amber-400 */
+}
+.meta-upgrade-button:active:not(.disabled) {
+    transform: translateY(2px);
+    border-bottom: 2px solid #b45309;
+}
+.meta-upgrade-button.disabled {
+    background-color: #4b5563; /* Gray-600 */
+    border-color: #374151;
+    color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.meta-upgrade-button.maxed {
+    background-color: var(--action-color);
+    border-color: var(--action-border);
+    color: var(--main-bg);
+    cursor: default;
+}
+
+/* ===== NOVOS ESTILOS (LOJA DE SKIN) ===== */
+.skin-item {
+    display: flex;
+    flex-direction: column; /* Organiza verticalmente */
+    align-items: center;
+    background-color: var(--hud-bg);
+    border: 2px solid var(--hud-border);
+    border-radius: 8px;
+    padding: 16px 12px;
+    width: 100%;
+    gap: 8px; /* Espaço entre os elementos */
+    transition: transform 0.2s ease;
+}
+.skin-item:hover {
+    transform: scale(1.03);
+}
+.skin-emoji {
+    font-size: 3rem; /* Emoji grande */
+    line-height: 1;
+    transition: transform 0.5s ease;
+}
+/* ANIMAÇÃO DE HOVER (JIGGLE) - SUGESTÃO 1.C */
+@keyframes jiggle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.15) rotate(-8deg); }
+  75% { transform: scale(1.15) rotate(8deg); }
+}
+.skin-item:hover .skin-emoji {
+  animation: jiggle 0.5s ease-in-out;
+}
+
+.skin-info h4 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+}
+
+/* === INÍCIO - NOVO ESTILO (BÔNUS DA SKIN) === */
+.skin-info {
+    /* Garante que o texto fique centralizado e ocupe o espaço */
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
+    flex-grow: 1; /* Faz o .skin-info preencher o espaço */
+}
+
+.skin-bonus-desc {
+    font-size: 0.8rem; /* 13px */
+    color: #d1d5db; /* Gray-300 */
+    margin-top: 4px;
+    line-height: 1.3;
+    /* Permite que o texto quebre a linha */
+    white-space: normal;
+    /* Define uma altura mínima para alinhar os botões */
+    min-height: 55px;
+}
+
+.skin-bonus-desc strong {
+    color: var(--action-color); /* Dourado */
+}
+
+.skin-bonus-xp {
+    /* Renomeamos de .skin-bonus-text para .skin-bonus-xp */
+    font-size: 0.75rem;
+    color: #facc15; /* Amarelo (XP) */
+    font-weight: bold;
+    margin-top: 8px; /* Adiciona espaço acima do bônus de XP */
+    text-align: center;
+}
+/* === FIM - NOVO ESTILO === */
+
+.skin-button {
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    background-color: #f59e0b; /* Amber-500 */
+    color: var(--main-bg);
+    border: 2px solid #b45309; /* Amber-700 */
+    border-bottom: 4px solid #b45309;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: all 0.1s;
+    width: 100%; /* Botão ocupa a largura total */
+}
+.skin-button:hover:not(.disabled) {
+    background-color: #facc15; /* Amber-400 */
+}
+.skin-button:active:not(.disabled) {
+    transform: translateY(2px);
+    border-bottom: 2px solid #b45309;
+}
+.skin-button.disabled {
+    background-color: #4b5563; /* Gray-600 */
+    border-color: #374151;
+    color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+/* Botão "Selecionar" (Verde) */
+.skin-button.select-skin {
+    background-color: var(--action-color);
+    border-color: var(--action-border);
+}
+.skin-button.select-skin:hover:not(.disabled) {
+    background-color: var(--button-main-hover);
+}
+.skin-button.select-skin:active:not(.disabled) {
+    transform: translateY(2px);
+    border-bottom: 2px solid var(--action-border);
+}
+/* Botão "Selecionada" (Cinza claro, desativado) */
+.skin-button.selected-skin {
+    background-color: #9ca3af; /* Gray-400 */
+    border-color: #6b7280; /* Gray-500 */
+    color: var(--main-bg);
+    cursor: default;
+}
+
+
+/* ===== ESTILOS CONTROLE DE VOLUME ===== */
+.volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100px;
+    height: 8px;
+    background: #4b5563; /* Gray-600 */
+    outline: none;
+    border-radius: 4px;
+    transition: opacity .2s;
+    cursor: pointer;
+}
+.volume-slider:disabled {
+    cursor: not-allowed;
+}
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--action-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--action-border);
+}
+.volume-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--action-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--action-border);
+}
+
+/* ========================================= */
+/* = INÍCIO - ESTILOS DE MENU			   = */
+/* ========================================= */
+
+/* Animação de pulso dourado para o título */
+@keyframes pulse-gold {
+    0% { text-shadow: 0 0 5px rgba(245, 189, 31, 0.4); filter: brightness(1); }
+    100% { text-shadow: 0 0 15px 5px rgba(245, 189, 31, 0.9); filter: brightness(1.2); }
+}
+
+/* --- ADIÇÃO: Animação de Respiração --- */
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); } /* Expande sutilmente */
+}
+
+/* --- MODIFICAÇÃO: Aplica ambas as animações ao H1 --- */
+#start-screen h1 {
+    /* Combina as animações: pulso de cor E respiração */
+    animation:
+        pulse-gold 2s infinite alternate,
+        breathe 4s infinite alternate ease-in-out; /* Nova animação adicionada */
+
+    /* Garante que o transform-origin está no centro para a escala */
+    transform-origin: center;
+}
+
+/* Estilo para o emoji da skin no menu */
+#start-screen-skin {
+    font-size: 5rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+    /* Animação sutil de flutuação */
+    animation: float-skin 3s infinite alternate ease-in-out;
+}
+
+@keyframes float-skin {
+    0% { transform: translateY(-5px); }
+    100% { transform: translateY(5px); }
+}
+
+/* ANIMAÇÃO DE CELEBRAÇÃO (SUGESTÃO 1.C) */
+@keyframes celebration-pop {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.4) rotate(15deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.celebrate-skin {
+  animation: celebration-pop 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Estilos para a Loja Unificada (Abas) */
+.store-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    border-bottom: 4px solid var(--hud-border);
+    padding-bottom: 15px;
+    width: 100%;
+    max-width: 6xl; /* Tailwind max-w-6xl */
+}
+
+.store-tabs button {
+    /* Reutiliza o estilo do utility-button, mas sem o transform */
+    flex-grow: 1;
+    max-width: 250px;
+}
+.store-tabs button:hover:not(.disabled) {
+    transform: scale(1); /* Remove o hover de escala do utility-button */
+}
+.store-tabs button:active:not(.disabled) {
+    transform: translateY(2px) scale(1); /* Remove o hover de escala do utility-button */
+}
+
+.store-content.hidden {
+    display: none;
+}
+
+/* Container para o banco de gemas e bônus de skin */
+.store-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+
+    padding: 16px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    border: 2px solid var(--hud-border);
+}
+
+/* Utilitário para esconder elementos */
+.hidden {
+    display: none;
+}
+
+/* ===== NOVOS ESTILOS (CÓDICE E CONQUISTAS) ===== */
+/* Estilo para a tela do Códice e Conquistas */
+.codex-header-info {
+    /* Estilo para centralizar o título quando não há botões extras */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 6xl; /* Tailwind max-w-6xl */
+    margin-bottom: 4px; /* Espaço antes das abas */
+    position: relative; /* Para o botão Voltar */
+}
+.codex-header-info .utility-button {
+    position: absolute;
+    left: 16px; /* Alinha o "Voltar" à esquerda */
+}
+#codex-screen h1, #achievements-screen h1 {
+    text-align: center;
+    flex-grow: 1;
+}
+
+/* Item do Códice (Inimigo, Arma, Item) */
+.codex-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: var(--hud-bg);
+    border: 2px solid var(--hud-border);
+    border-radius: 8px;
+    padding: 16px 12px;
+    width: 100%;
+    gap: 8px;
+}
+.codex-emoji {
+    font-size: 2.5rem; /* Emoji grande */
+    line-height: 1;
+}
+.codex-info h4 {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+.codex-info p {
+    font-size: 0.8125rem;
+    color: #d1d5db; /* Gray-300 */
+    margin-top: 4px;
+}
+.codex-item.locked {
+    background-color: rgba(0,0,0,0.3);
+    border-color: rgba(74, 74, 122, 0.5); /* hud-border com alpha */
+    filter: grayscale(80%);
+    opacity: 0.7;
+}
+.codex-item.locked .codex-emoji {
+    filter: blur(2px);
+}
+.codex-item.locked .codex-info h4 {
+    color: #9ca3af; /* Gray-400 */
+}
+.codex-item.locked .codex-info p {
+    color: #6b7280; /* Gray-500 */
+}
+
+/* Item de Conquista */
+.achievement-item {
+    display: flex;
+    align-items: center;
+    background-color: var(--hud-bg);
+    border: 2px solid var(--hud-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    width: 100%;
+    gap: 16px;
+}
+.achievement-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.achievement-info h4 {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+.achievement-info p {
+    font-size: 0.8125rem;
+    color: #d1d5db;
+}
+.achievement-item.locked {
+    background-color: rgba(0,0,0,0.3);
+    border-color: rgba(74, 74, 122, 0.5);
+    opacity: 0.7;
+}
+.achievement-item.locked .achievement-icon {
+    color: var(--hud-border);
+    filter: grayscale(100%);
+}
+.achievement-item.locked .achievement-info h4 {
+    color: #9ca3af;
+}
+ .achievement-item.locked .achievement-info p {
+    color: #6b7280;
+}
+
+/* ===== FEEDBACK SELEÇÃO UPGRADE ===== */
+@keyframes select-upgrade-pop {
+	0% { transform: scale(1); filter: brightness(1); }
+	50% { transform: scale(1.1); filter: brightness(1.8); box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.5); }
+	100% { transform: scale(1); filter: brightness(1); }
+}
+.upgrade-selected-animation {
+	animation: select-upgrade-pop 0.3s ease-out forwards;
+	/* Garante que fique acima de outras opções durante a animação */
+	position: relative;
+	z-index: 10;
+}
+/* ===== NOVOS ESTILOS (DESCRIÇÃO DA SKIN) ===== */
+.skin-info {
+    /* Garante que o texto fique centralizado e ocupe o espaço */
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
+    flex-grow: 1; /* Faz o .skin-info preencher o espaço */
+}
+
+.skin-bonus-desc {
+    font-size: 0.8rem; /* 13px */
+    color: #d1d5db; /* Gray-300 */
+    margin-top: 4px;
+    line-height: 1.3;
+    /* Permite que o texto quebre a linha */
+    white-space: normal;
+    /* Define uma altura mínima para alinhar os botões */
+    min-height: 55px;
+}
+
+.skin-bonus-desc strong {
+    color: var(--action-color); /* Dourado */
+}
+
+.skin-bonus-xp {
+    /* Renomeamos de .skin-bonus-text para .skin-bonus-xp */
+    font-size: 0.75rem;
+    color: #facc15; /* Amarelo (XP) */
+    font-weight: bold;
+    margin-top: 8px; /* Adiciona espaço acima do bônus de XP */
+    text-align: center;
+}
+/* Animação de Entrada (Fade In + Slide Up) */
+@keyframes fadeInSlideUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Classe para aplicar a animação de entrada */
+.animate-fade-in-slide-up {
+    animation: fadeInSlideUp 0.5s ease-out forwards;
+    opacity: 0; /* Começa invisível */
+}
+/* ========================================= */
+/* = FIM - NOVOS ESTILOS DE MENU 		   = */
+/* ========================================= */
