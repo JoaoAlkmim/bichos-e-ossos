@@ -46,21 +46,21 @@ flowchart TD
 
 ## 📱 Fase 2: Acessibilidade e Multiplataforma (Para quem joga)
 
-*O jogo já roda via GitHub Pages, mas ainda depende de teclado/mouse no desktop. Esta fase abre as portas para mobile, consoles portáteis e portabilidade de progresso.*
+*O jogo agora é totalmente acessível em celulares, tablets, computadores com controle ou teclado/mouse, e suporta jogo offline.*
 
-- [ ] **2.1 Controles Touch para Dispositivos Móveis:**
-  - Joystick virtual analógico transparente no canto inferior esquerdo da tela.
-  - Botões de ação rápidos no canto direito (`Dash`, `Impacto`, `Berserk`, `Brinde`).
-  - Permite jogar em celulares e tablets diretamente pelo navegador, aumentando o público potencial.
-- [ ] **2.2 Suporte a Gamepad (HTML5 Gamepad API):**
-  - Mapear analógico esquerdo para movimentação, gatilhos/botões frontais para Dash, Impacto e Berserk.
-  - Compatibilidade com controles de Xbox, PlayStation e genéricos via Bluetooth/USB.
-- [ ] **2.3 Exportação e Importação de Save (JSON):**
-  - Botão no menu de Configurações para exportar o progresso (`localStorage`) como um arquivo `.json` ou texto base64.
-  - Permite transferir save do PC para o celular, e ajuda desenvolvedores a injetarem saves de teste.
-- [ ] **2.4 Progressive Web App (PWA):**
-  - Adicionar `manifest.json` e um `service-worker.js` simples para cache offline.
-  - O jogador pode clicar em "Instalar App" no Chrome/Edge/Safari e jogar em tela cheia sem barras de navegador, mesmo sem internet.
+- [x] **2.1 Controles Touch para Dispositivos Móveis (`InputManager`):**
+  - Joystick virtual analógico com feedback visual dinâmico na metade esquerda da tela.
+  - Botões de habilidade no HUD otimizados para toque instantâneo sem delay (`Dash`, `Impacto`, `Berserk`, `Brinde`).
+  - Suporte completo para jogar em smartphones e tablets pelo link do GitHub Pages.
+- [x] **2.2 Suporte a Gamepad (HTML5 Gamepad API):**
+  - Mapeamento nativo de analógico esquerdo e D-Pad para movimentação 360°.
+  - Gatilhos e botões de ação mapeados para Dash (A), Impacto (B), Berserk (X), Brinde (Y) e Pausa (Start).
+- [x] **2.3 Exportação e Importação de Save (JSON):**
+  - Botões dedicados no menu de Configurações para exportar e importar o progresso do `localStorage` em arquivo `.json`.
+  - Permite backup, transferência entre dispositivos e carregamento de saves de teste.
+- [x] **2.4 Progressive Web App (PWA & Offline):**
+  - Adicionado `manifest.json` com ícone de alta resolução e `sw.js` com cache offline dinâmico.
+  - Permite instalar o jogo diretamente na tela inicial do celular ou desktop e jogar offline.
 
 ---
 
@@ -120,10 +120,11 @@ flowchart TD
 | :--- | :---: | :---: | :---: |
 | **Arquitetura Plug-and-Play (`GameRegistry`)** | 💡 Alto (para devs) | 🟢 Baixo-Médio | Concluído (Fase 1) |
 | **Guia de Modding & JSDoc** | 💡 Alto (para devs) | 🟢 Baixo | Concluído (Fase 1) |
-| **Controles Touch (Mobile)** | 🔥 Muito Alto | 🟢 Baixo-Médio | Planejado (Fase 2) |
-| **Export/Import de Save** | 🟢 Alto | 🟢 Muito Baixo | Planejado (Fase 2) |
+| **Controles Touch (Mobile)** | 🔥 Muito Alto | 🟢 Baixo-Médio | Concluído (Fase 2) |
+| **Export/Import de Save** | 🟢 Alto | 🟢 Muito Baixo | Concluído (Fase 2) |
 | **Sinergias/Evolução de Armas** | 🔥 Muito Alto | 🟡 Médio | Planejado (Fase 3) |
-| **Modo PWA (Offline/Instalável)** | 🟢 Alto | 🟢 Baixo | Planejado (Fase 2) |
-| **Suporte a Gamepad** | 🟡 Médio | 🟢 Baixo | Planejado (Fase 2) |
+| **Modo PWA (Offline/Instalável)** | 🟢 Alto | 🟢 Baixo | Concluído (Fase 2) |
+| **Suporte a Gamepad** | 🟡 Médio | 🟢 Baixo | Concluído (Fase 2) |
 | **Hit-Stop & Game Juice** | 🟢 Alto | 🟢 Baixo | Planejado (Fase 4) |
 | **Internacionalização (PT/EN)** | 🟢 Alto | 🟡 Médio | Planejado (Fase 5) |
+

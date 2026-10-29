@@ -188,3 +188,4 @@ Ao contribuir com código para o loop principal, siga estas diretrizes:
 ---
 
 Agradecemos imensamente por ajudar a construir o universo de **Bichos & Ossos**! 🚀
+

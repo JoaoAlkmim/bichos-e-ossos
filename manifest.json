@@ -1,0 +1,19 @@
+{
+  "name": "Bichos & Ossos - Roguelite Survivor",
+  "short_name": "Bichos&Ossos",
+  "description": "Um frenético roguelite survivor 2D em HTML5 Canvas e Web Audio API.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

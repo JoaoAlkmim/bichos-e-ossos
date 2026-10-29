@@ -1,4 +1,4 @@
-// main.js
+﻿// main.js
         // --- Setup Firebase (Não está em uso, mantido para aderência/futuro) ---
         //import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         //import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1300,7 +1300,19 @@ function gameLoop(currentTime) {
     let dx = 0, dy = 0;
     const wasDashing = player.dashDuration > 0; // Verifica ANTES de decrementar dashDuration
 
-    if (controlScheme === 'wasd') {
+    // --- Suporte a Controles Touch (Joystick) e Gamepad via InputManager ---
+    let inputVector = { dx: 0, dy: 0, isOverriding: false };
+    if (typeof InputManager !== 'undefined') {
+        InputManager.pollGamepad();
+        inputVector = InputManager.getMovementVector();
+    }
+
+    if (inputVector.isOverriding) {
+        dx = inputVector.dx;
+        dy = inputVector.dy;
+        movementTarget.x = null;
+        movementTarget.y = null;
+    } else if (controlScheme === 'wasd') {
         // Normaliza WASD para evitar movimento diagonal mais rápido
         let moveX = 0;
         let moveY = 0;
@@ -2532,6 +2544,11 @@ function gameLoop(currentTime) {
             // --- Códice e Conquistas ---
             codexScreen = document.getElementById('codex-screen');
             achievementsScreen = document.getElementById('achievements-screen');
+
+            // --- Inicialização do InputManager (Touch / Gamepad / Save) ---
+            if (typeof InputManager !== 'undefined') {
+                InputManager.init();
+            }
 
             // --- Botões do Menu Inicial ---
             document.getElementById('start-button').addEventListener('click', () => {

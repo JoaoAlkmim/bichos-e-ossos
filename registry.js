@@ -221,3 +221,4 @@
     global.GameRegistry = GameRegistry;
 
 })(typeof window !== 'undefined' ? window : this);
+

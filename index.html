@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="utf-8"/>
@@ -7,12 +7,20 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&amp;display=swap" rel="stylesheet"/>
 
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
 
 </head>
 <body>
 <div id="game-container" class="game-level-up">
 <canvas id="game-canvas"></canvas>
+
+<!-- Joystick Virtual Touch para Dispositivos Móveis -->
+<div id="touch-joystick-zone" class="touch-joystick-zone">
+    <div id="touch-joystick-base" class="touch-joystick-base hidden">
+        <div id="touch-joystick-knob" class="touch-joystick-knob"></div>
+    </div>
+</div>
 
 <div class="hud-panel w-48 text-white" id="progress-hud">
 <h3 class="text-sm font-bold mb-2 text-center text-white">Progresso</h3>
@@ -239,6 +247,15 @@
             </div>
         </div>
 
+                <div class="bg-gray-800 p-4 rounded-lg">
+            <label class="text-white text-lg mb-3 block text-center">Dados de Jogo (Save):</label>
+            <div class="flex gap-2">
+                <button class="utility-button flex-1 text-sm" id="export-save-btn">💾 Exportar</button>
+                <button class="utility-button flex-1 text-sm" id="import-save-btn">📂 Importar</button>
+            </div>
+            <input type="file" id="import-save-input" accept=".json" style="display: none;">
+        </div>
+
         <button class="utility-button" id="fullscreen-btn-settings">TELA CHEIA</button>
     </div>
     
@@ -344,6 +361,7 @@
 <script src="classes.js"></script>
 <script src="ui.js"></script>
 <script src="logic.js"></script>
+<script src="input.js"></script>
 <script src="main.js"></script>
 
 </body>
