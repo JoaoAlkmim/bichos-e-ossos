@@ -2389,6 +2389,7 @@ function gameLoop(currentTime) {
 
         // Ajusta o canvas quando a janela muda de tamanho
         window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 100));
 
         // Movimento por clique
         canvas.addEventListener('mousedown', (e) => {

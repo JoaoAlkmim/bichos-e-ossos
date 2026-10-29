@@ -11,13 +11,19 @@
 body {
     background-color: var(--main-bg);
     font-family: var(--pixel-font);
-	color: #f0f0f8; /* Branco levemente Lavanda (mais suave) */
+    color: #f0f0f8;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    width: 100dvw;
     margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
 }
 #game-container {
     display: flex;
@@ -333,34 +339,68 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(26, 26, 46, 0.7); /* var(--main-bg) com 70% opacidade */
-    backdrop-filter: blur(5px); /* Desfoca o que está atrás */
+    max-height: 100%;
+    background-color: rgba(26, 26, 46, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 
-    display: flex; /* Usar flex para centralizar */
+    display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     z-index: 100;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: clamp(14px, 3vh, 32px) clamp(10px, 3vw, 24px);
 
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: scale(0.95); /* Começa um pouco menor */
+    transform: scale(0.96);
     transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
 
-    /* ---> Vignette (Aplicada a todas as overlays) <--- */
-    box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.4);
-
-    /* ---> Fundo Sutil (Aplicado a todas as overlays) <--- */
-    background-image: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 70%);
+    box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.5);
+    background-image: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 70%);
 }
 
-/* Classe 'visible' que ativa o overlay */
+/* Centralização vertical inteligente sem quebrar o scroll ao ultrapassar a tela */
+.overlay-screen::before,
+.overlay-screen::after {
+    content: '';
+    margin: auto;
+}
+
 .overlay-screen.visible {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: scale(1); /* Cresce para o tamanho normal */
+    transform: scale(1);
+}
+
+/* Títulos e Tipografia Responsiva Universal */
+.overlay-screen h1 {
+    font-size: clamp(1.5rem, 5vw, 3rem) !important;
+    line-height: 1.2;
+    text-align: center;
+    width: 100%;
+    max-width: 95vw;
+    margin-bottom: clamp(0.75rem, 2vh, 1.75rem) !important;
+    word-break: break-word;
+}
+.overlay-screen h2 {
+    font-size: clamp(1.2rem, 3.8vw, 2rem) !important;
+    text-align: center;
+    max-width: 95vw;
+    line-height: 1.25;
+}
+.overlay-screen h3, .overlay-screen h4 {
+    text-align: center;
+}
+.overlay-screen p {
+    text-align: center;
+    max-width: 92vw;
 }
 
 .main-button {
@@ -489,80 +529,230 @@ body {
     100% { opacity: 0; transform: translateY(-50px); }
 }
 
-@media (max-width: 768px) {
+/* ======================================================= */
+/* = SISTEMA RESPONSIVO UNIVERSAL (MOBILE RETRATO & PAISAGEM) = */
+/* ======================================================= */
+
+/* --- 1. Regras Gerais para Telas Móveis (Largura <= 768px ou Altura <= 520px) --- */
+@media (max-width: 768px), (max-height: 520px) {
     .hud-panel {
-        padding: 4px;
-        font-size: 0.6rem;
+        padding: 4px 6px;
+        border-radius: 6px;
+        box-shadow: 0 2px #000;
     }
     .hud-text {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         margin-bottom: 2px;
+        line-height: 1.15;
     }
-    .ability-btn {
-        padding: 6px 8px;
-        font-size: 0.6rem;
+    .hud-panel h3 {
+        font-size: 0.72rem;
+        margin-bottom: 3px;
     }
-    /* Ajuste de Responsividade com clamp() */
-    #progress-hud {
-         width: clamp(140px, 30vw, 192px);
+    #pause-btn {
+        top: 6px;
+        right: 6px;
+        padding: 5px 10px;
+        font-size: 0.75rem;
+        z-index: 35;
     }
+    .passive-weapon-slot .tooltip-text {
+        left: 105%;
+        bottom: 50%;
+        transform: translateY(50%);
+        font-size: 0.65rem;
+        max-width: 190px;
+    }
+    /* Oculta atributos na gameplay para liberar a tela pequena (disponível no Pause) */
     #attributes-hud {
-        width: clamp(140px, 30vw, 192px); /* w-48 */
-        min-width: unset;
+        display: none !important;
     }
-     #status-hud {
-        width: clamp(140px, 30vw, 250px);
-        min-width: unset;
-    }
-	/* Ajuste HUD Brindes */
-    #powerup-hud {
-        width: clamp(140px, 30vw, 170px);
-        bottom: 160px;
-        font-size: 0.75rem;
-        padding: 4px;
-    }
+}
 
-    /* Ajuste HUD Armas Passivas */
-    #passive-weapons-hud {
-        width: clamp(140px, 30vw, 170px);
-        bottom: 160px; /* Espelha o powerup-hud */
-        left: 10px;
-        font-size: 0.75rem;
+/* --- 2. Mobile em Modo RETRATO (Vertical: Largura <= 768px e Altura > 520px) --- */
+@media (max-width: 768px) and (orientation: portrait) {
+    #progress-hud {
+        top: 6px;
+        left: 6px;
+        width: clamp(120px, 34vw, 155px);
+        z-index: 30;
+    }
+    #powerup-hud {
+        top: 44px;
+        right: 6px;
+        bottom: auto;
+        width: clamp(90px, 26vw, 120px);
         padding: 4px;
+        font-size: 0.68rem;
+        text-align: center;
+        z-index: 30;
+    }
+    #status-hud {
+        bottom: 6px;
+        left: 6px;
+        width: clamp(125px, 38vw, 165px);
+        min-width: unset;
+        z-index: 30;
+    }
+    #class-display-hud {
+        font-size: 0.72rem;
+        padding-bottom: 2px;
+        margin-bottom: 2px !important;
+    }
+    #passive-weapons-hud {
+        bottom: 84px;
+        left: 6px;
+        width: auto;
+        padding: 3px 6px;
+        z-index: 30;
+    }
+    #passive-weapons-hud h3 {
+        display: none;
     }
     .passive-weapon-slot {
-        width: 48px;
-        height: 48px;
+        width: 36px;
+        height: 36px;
     }
     .passive-weapon-slot .emoji {
-        font-size: 1.5rem; /* 24px */
+        font-size: 1.15rem;
     }
-    .passive-weapon-slot:empty::before {
-        font-size: 2rem;
-    }
-
-    /* --- Ajuste Tooltip Armas Móvel --- */
-    .passive-weapon-slot .tooltip-text {
-        /* Em telas pequenas, força o tooltip a ir para a DIREITA */
-        left: 105%; /* Posição à direita do slot */
-        bottom: 50%; /* Centraliza verticalmente */
-        transform: translateY(50%); /* Centraliza verticalmente */
+    .passive-weapon-slot .level {
+        font-size: 0.55rem;
+        margin-top: 1px;
     }
 
-    /* Ajuste Toast Container (Móvel) */
+    /* Botões de Habilidade no canto direito (alcance do polegar direito) */
+    #abilities-hud {
+        bottom: 6px;
+        right: 6px;
+        left: auto;
+        transform: none;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-end;
+        z-index: 30;
+    }
+    .ability-btn {
+        padding: 5px 8px;
+        font-size: 0.65rem;
+        min-width: 80px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 4px;
+    }
+
     #upgrade-toast-container {
-        bottom: 200px; /* Posição acima do HUD de Brindes móvel */
+        top: 86px;
+        right: 6px;
+        bottom: auto;
+        align-items: flex-end;
     }
 
-    #pause-btn {
-        top: 5px;
-        right: 5px;
-        padding: 6px 8px;
+    #level-up-screen #upgrade-options {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        max-width: 290px;
     }
-    #fullscreen-btn { /* Este ID pode não existir mais */
-        top: 5px;
-        right: 80px;
+    .upgrade-option {
+        max-width: 100%;
+        padding: 8px 12px;
+        font-size: 0.75rem;
+    }
+}
+
+/* --- 3. Mobile em Modo PAISAGEM (Horizontal: Altura <= 520px) --- */
+@media (max-height: 520px) and (orientation: landscape) {
+    #progress-hud {
+        top: 4px;
+        left: 4px;
+        width: clamp(120px, 20vw, 160px);
+        padding: 3px 6px;
+        z-index: 30;
+    }
+    #passive-weapons-hud {
+        top: 4px;
+        left: calc(clamp(120px, 20vw, 160px) + 8px);
+        bottom: auto;
+        padding: 2px 5px;
+        display: flex;
+        align-items: center;
+        z-index: 30;
+    }
+    #passive-weapons-hud h3 {
+        display: none;
+    }
+    .passive-weapon-slot {
+        width: 32px;
+        height: 32px;
+    }
+    .passive-weapon-slot .emoji {
+        font-size: 1rem;
+    }
+    #powerup-hud {
+        top: 4px;
+        right: 75px;
+        bottom: auto;
+        width: auto;
+        padding: 3px 8px;
+        z-index: 30;
+    }
+    #pause-btn {
+        top: 4px;
+        right: 4px;
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+
+    #status-hud {
+        bottom: 4px;
+        left: 4px;
+        width: clamp(135px, 22vw, 180px);
+        min-width: unset;
+        padding: 3px 6px;
+        z-index: 30;
+    }
+    #abilities-hud {
+        bottom: 4px;
+        right: 4px;
+        left: auto;
+        transform: none;
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        z-index: 30;
+    }
+    .ability-btn {
+        padding: 5px 8px;
+        font-size: 0.65rem;
+    }
+
+    .overlay-screen {
+        padding: 8px 14px;
+    }
+    .overlay-screen h1 {
+        font-size: clamp(1.3rem, 3.8vw, 2rem) !important;
+        margin-bottom: 6px !important;
+    }
+    #start-screen-skin {
+        font-size: 2.25rem !important;
+        margin-bottom: 2px !important;
+    }
+    #level-up-screen #upgrade-options {
+        flex-direction: row !important;
+        gap: 6px;
+        max-width: 96vw;
+    }
+    .upgrade-option {
         padding: 6px 8px;
+        font-size: 0.68rem;
+        max-width: 220px;
+    }
+
+    .store-content {
+        max-height: 55vh !important;
     }
 }
 
@@ -623,20 +813,22 @@ body {
 /* ===== CONQUISTAS TEMPORÁRIAS ===== */
 #achievement-container {
   position: absolute;
-  top: 20px;
+  top: clamp(8px, 2.5vh, 20px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 200;
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: clamp(260px, 90vw, 500px);
+  max-width: 95vw;
   pointer-events: none;
 }
 .achievement {
-  background: rgba(31, 41, 55, 0.9);
+  background: rgba(31, 41, 55, 0.95);
   border: 2px solid #06f79a;
   color: #ffffff;
-  font-size: 1rem;
+  font-size: clamp(0.75rem, 3.2vw, 0.95rem);
   font-weight: bold;
   padding: 8px 16px;
   border-radius: 10px;
@@ -645,6 +837,9 @@ body {
   transform: translateY(-20px);
   transition: all 0.3s ease;
   text-align: center;
+  max-width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
 }
 .achievement.show { opacity: 1; transform: translateY(0); }
 .achievement.hide { opacity: 0; transform: translateY(-20px); }
@@ -728,22 +923,25 @@ body {
 /* ===== ALERTA DE INIMIGO ESPECIAL ===== */
 #special-enemy-alert {
     position: absolute;
-    top: 10%;
+    top: clamp(10px, 6vh, 40px);
     left: 50%;
     transform: translateX(-50%);
     z-index: 201;
-    background: rgba(150, 0, 0, 0.5);
+    background: rgba(150, 0, 0, 0.75);
     border: 4px solid #ef4444;
     color: #ffffff;
-    font-size: 1.5rem;
+    font-size: clamp(0.9rem, 4vw, 1.5rem);
     font-weight: bold;
-    padding: 10px 20px;
-    border-radius: 4px;
+    padding: 8px 16px;
+    border-radius: 6px;
     text-align: center;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     opacity: 0;
     transition: all 0.5s ease;
     pointer-events: none;
+    width: clamp(260px, 88vw, 520px);
+    max-width: 95vw;
+    box-sizing: border-box;
 }
 #special-enemy-alert.show {
     opacity: 1;
@@ -1075,10 +1273,10 @@ body {
 
 /* Estilo para o emoji da skin no menu */
 #start-screen-skin {
-    font-size: 5rem;
+    font-size: clamp(2.5rem, 8vw, 4.5rem) !important;
     line-height: 1;
-    margin-bottom: 1rem;
-    /* Animação sutil de flutuação */
+    margin-bottom: clamp(0.5rem, 1.5vh, 1rem) !important;
+    text-align: center;
     animation: float-skin 3s infinite alternate ease-in-out;
 }
 
