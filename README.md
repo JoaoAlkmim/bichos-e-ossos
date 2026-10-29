@@ -147,3 +147,4 @@ Distribuído sob a licença **MIT**. Veja o arquivo `LICENSE` para mais detalhes
 ---
 
 *Desenvolvido com dedicação por [João Alkmim](https://github.com/JoaoAlkmim).*
+
