@@ -573,7 +573,14 @@ function checkCollisions() {
                     if (!stats) continue; // Nível inválido
 
                     // --- Dispara a lógica específica da arma ---
-                    if (weapon.id === 'auraDourada') {
+                    // Suporte a Handlers dinâmicos (GameRegistry)
+                    const dynamicHandler = (typeof definition.onFire === 'function')
+                        ? definition.onFire
+                        : (typeof GameRegistry !== 'undefined' ? GameRegistry.getWeaponHandler(weapon.id) : null);
+
+                    if (dynamicHandler) {
+                        dynamicHandler(weapon, stats, dt);
+                    } else if (weapon.id === 'auraDourada') {
                         fireAuraDourada(weapon, stats);
                     } else if (weapon.id === 'garrasAfiadas') {
                         fireGarrasAfiadas(weapon, stats);

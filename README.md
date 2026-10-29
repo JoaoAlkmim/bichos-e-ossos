@@ -140,6 +140,15 @@ O repositório está pronto para ser publicado diretamente no **GitHub Pages**:
 
 ---
 
+## 🗺️ Roadmap e Contribuições
+
+Este é um projeto de código aberto voltado tanto para o público gamer quanto para desenvolvedores que desejam estudar ou criar seus próprios jogos.
+
+- 🗺️ Consulte o [**ROADMAP.md**](ROADMAP.md) para ver as fases de evolução planejadas (mobile, sinergias de armas, PWA, etc.).
+- 🤝 Consulte o [**CONTRIBUTING.md**](CONTRIBUTING.md) para aprender a arquitetura e ver o tutorial de como adicionar uma nova arma ou skin em 5 minutos usando a API `GameRegistry`!
+
+---
+
 ## 📄 Licença
 
 Distribuído sob a licença **MIT**. Veja o arquivo `LICENSE` para mais detalhes.

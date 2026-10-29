@@ -1,4 +1,4 @@
-// classes.js
+﻿// classes.js
 
         // Classe base para Jogador e Inimigos
         class Entity {
@@ -1671,6 +1671,15 @@
                 this.currentMoveSpeed = this.moveSpeed;
                 this.currentAttackSpeed = this.attackSpeed;
                 // --- FIM DA APLICAÇÃO DOS BÔNUS ---
+                // Hook customizado de skin registrado via GameRegistry
+                if (skinData) {
+                    const customSkinHook = (typeof skinData.onApply === 'function')
+                        ? skinData.onApply
+                        : (typeof GameRegistry !== 'undefined' ? GameRegistry.getSkinHook(skinData.id) : null);
+                    if (customSkinHook) {
+                        customSkinHook(this);
+                    }
+                }
                 this.xpNeeded = getXPNeeded(1); // Ajusta o XP inicial
             }
 
